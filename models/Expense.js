@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const ExpenseSchema = new mongoose.Schema(
   {
     amount: {
-      type: number,
+      type: Number,
       required: [true, 'Please provide amount'],
     },
     description: {
@@ -14,12 +14,12 @@ const ExpenseSchema = new mongoose.Schema(
     category: {
       type: String,
       enum: [
-        'Household & Services',
-        'Health & Beauty',
-        'Food & Drinks',
+        'Household and Services',
+        'Health and Beauty',
+        'Food and Drinks',
         'Shopping',
       ],
-      default: 'Household & Services',
+      default: 'Household and Services',
     },
     location: {
       type: String,

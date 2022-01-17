@@ -1,11 +1,16 @@
-import Expense from '../models/Expense';
+import Expense from '../models/Expense.js';
 import { StatusCodes } from 'http-status-codes';
 import { BadRequestError, NotFoundError } from '../errors/index.js';
 import checkPermissions from '../utils/checkPermissions.js';
 import mongoose from 'mongoose';
 import moment from 'moment';
+
 const createExpense = async (req, res) => {
   const { amount, description } = req.body;
+
+  if (amount <= 0) {
+    throw new BadRequestError('Amount has to be greater than 0!');
+  }
 
   if (!amount || !description) {
     throw new BadRequestError('Please provide all values');
@@ -14,6 +19,7 @@ const createExpense = async (req, res) => {
   const expense = await Expense.create(req.body);
   res.status(StatusCodes.CREATED).json({ expense });
 };
+
 const getAllExpenses = async (req, res) => {
   const { category, sort, search } = req.query;
 
@@ -26,9 +32,8 @@ const getAllExpenses = async (req, res) => {
     queryObject.category = category;
   }
   if (search) {
-    queryObject.location = { $regex: search, $options: 'i' };
+    queryObject.description = { $regex: search, $options: 'i' };
   }
-  // NO AWAIT
 
   let result = Expense.find(queryObject);
 
@@ -40,14 +45,12 @@ const getAllExpenses = async (req, res) => {
   if (sort === 'oldest') {
     result = result.sort('createdAt');
   }
-  if (sort === 'a-z') {
-    result = result.sort('position');
+  if (sort === '$ (asc)') {
+    result = result.sort('amount');
   }
-  if (sort === 'z-a') {
-    result = result.sort('-position');
+  if (sort === '$ (desc)') {
+    result = result.sort('-amount');
   }
-
-  //
 
   // setup pagination
   const page = Number(req.query.page) || 1;
@@ -63,6 +66,7 @@ const getAllExpenses = async (req, res) => {
 
   res.status(StatusCodes.OK).json({ expenses, totalExpenses, numOfPages });
 };
+
 const updateExpense = async (req, res) => {
   const { id: expenseId } = req.params;
   const { amount, description } = req.body;
@@ -90,6 +94,7 @@ const updateExpense = async (req, res) => {
 
   res.status(StatusCodes.OK).json({ updatedExpense });
 };
+
 const deleteExpense = async (req, res) => {
   const { id: expenseId } = req.params;
 
@@ -106,4 +111,40 @@ const deleteExpense = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: 'Success! Expense removed' });
 };
 
-export { createExpense, deleteExpense, getAllExpenses, updateExpense };
+const showStats = async (req, res) => {
+  let monthlyExpenses = await Expense.aggregate([
+    { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+    {
+      $group: {
+        _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
+        count: { $sum: '$amount' },
+      },
+    },
+    { $sort: { '_id.year': -1, '_id.month': -1 } },
+    { $limit: 6 },
+  ]);
+
+  monthlyExpenses = monthlyExpenses
+    .map((item) => {
+      const {
+        _id: { year, month },
+        count,
+      } = item;
+      const date = moment()
+        .month(month - 1)
+        .year(year)
+        .format('MMM Y');
+      return { date, count };
+    })
+    .reverse();
+
+  res.status(StatusCodes.OK).json({ monthlyExpenses });
+};
+
+export {
+  createExpense,
+  deleteExpense,
+  getAllExpenses,
+  updateExpense,
+  showStats,
+};
