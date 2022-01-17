@@ -1,3 +1,3 @@
 # Expensify
 
-MERN react project with typescript.
+MERN project with typescript.
