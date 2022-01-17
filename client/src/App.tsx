@@ -1,25 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Register, Landing, Error, ProtectedRoute } from './pages';
+import {
+  AllExpenses,
+  Profile,
+  SharedLayout,
+  Stats,
+  AddExpense,
+} from './pages/dashboard';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <SharedLayout />
+            </ProtectedRoute>
+          }
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+          <Route index element={<Stats />} />
+          <Route path="all-expenses" element={<AllExpenses />} />
+          <Route path="add-expense" element={<AddExpense />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
+        <Route path="/register" element={<Register />} />
+        <Route path="/landing" element={<Landing />} />
+        <Route path="*" element={<Error />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
