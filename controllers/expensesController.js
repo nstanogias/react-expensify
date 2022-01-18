@@ -123,16 +123,12 @@ const showStats = async (req, res) => {
     return acc;
   }, {});
 
-  console.log(stats);
-
   const defaultStats = {
     household_and_services: stats['Household and Services'] || 0,
     health_and_beauty: stats['Health and Beaty'] || 0,
     food_and_drinks: stats['Food and Drinks'] || 0,
     shopping: stats['Shopping'] || 0,
   };
-
-  console.log(defaultStats);
 
   let monthlyExpenses = await Expense.aggregate([
     { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },

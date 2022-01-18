@@ -182,7 +182,6 @@ const AppProvider: React.FC = ({ children }) => {
     endPoint: string,
     alertText: string
   ) => {
-    console.log(currentUser);
     dispatch({ type: action.SETUP_USER_BEGIN });
     try {
       const { data } = await axios.post(

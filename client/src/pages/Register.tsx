@@ -34,8 +34,6 @@ const Register: React.FC = () => {
     }
     const currentUser = { name, email, password };
     if (isMember) {
-      console.log('here');
-      console.log(currentUser);
       setupUser(currentUser, 'login', 'Login Successful! Redirecting...');
     } else {
       setupUser(currentUser, 'register', 'User Created! Redirecting...');
