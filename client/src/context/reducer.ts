@@ -194,6 +194,7 @@ const reducer = (state, action) => {
     return {
       ...state,
       isLoading: false,
+      stats: action.payload.stats,
       monthlyExpenses: action.payload.monthlyExpenses,
     };
   }

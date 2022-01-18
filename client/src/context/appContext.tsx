@@ -31,6 +31,12 @@ type AppContextObj = {
   numOfPages: number;
   page: number;
   monthlyExpenses: number;
+  stats: {
+    household_and_services: number;
+    health_and_beauty: number;
+    food_and_drinks: number;
+    shopping: number;
+  };
   search: string;
   searchCategory: string;
   sort: string;
@@ -88,6 +94,12 @@ const initialState = {
   numOfPages: 1,
   page: 1,
   monthlyExpenses: 0,
+  stats: {
+    household_and_services: 0,
+    health_and_beauty: 0,
+    food_and_drinks: 0,
+    shopping: 0,
+  },
   search: '',
   searchCategory: 'all',
   sort: 'latest',
@@ -323,7 +335,10 @@ const AppProvider: React.FC = ({ children }) => {
       const { data } = await authFetch('/expenses/stats');
       dispatch({
         type: action.SHOW_STATS_SUCCESS,
-        payload: { monthlyExpenses: data.monthlyExpenses },
+        payload: {
+          stats: data.defaultStats,
+          monthlyExpenses: data.monthlyExpenses,
+        },
       });
     } catch (error) {
       logoutUser();

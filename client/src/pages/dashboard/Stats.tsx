@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAppContext } from '../../context/appContext';
 import { Loading, ChartsContainer } from '../../components';
+import StatsContainer from '../../components/StatsContainer';
 
 const Stats: React.FC = () => {
   const { showStats, isLoading, monthlyExpenses } = useAppContext();
@@ -12,7 +13,12 @@ const Stats: React.FC = () => {
   if (isLoading) {
     return <Loading center />;
   }
-  return <>{monthlyExpenses && <ChartsContainer />}</>;
+  return (
+    <>
+      <StatsContainer />
+      {monthlyExpenses && <ChartsContainer />}
+    </>
+  );
 };
 
 export default Stats;

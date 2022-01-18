@@ -112,6 +112,28 @@ const deleteExpense = async (req, res) => {
 };
 
 const showStats = async (req, res) => {
+  let stats = await Expense.aggregate([
+    { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+    { $group: { _id: '$category', count: { $sum: '$amount' } } },
+  ]);
+
+  stats = stats.reduce((acc, curr) => {
+    const { _id: title, count } = curr;
+    acc[title] = count;
+    return acc;
+  }, {});
+
+  console.log(stats);
+
+  const defaultStats = {
+    household_and_services: stats['Household and Services'] || 0,
+    health_and_beauty: stats['Health and Beaty'] || 0,
+    food_and_drinks: stats['Food and Drinks'] || 0,
+    shopping: stats['Shopping'] || 0,
+  };
+
+  console.log(defaultStats);
+
   let monthlyExpenses = await Expense.aggregate([
     { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
     {
@@ -138,7 +160,7 @@ const showStats = async (req, res) => {
     })
     .reverse();
 
-  res.status(StatusCodes.OK).json({ monthlyExpenses });
+  res.status(StatusCodes.OK).json({ defaultStats, monthlyExpenses });
 };
 
 export {
