@@ -5,6 +5,9 @@ dotenv.config();
 import 'express-async-errors';
 import morgan from 'morgan';
 
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
 import helmet from 'helmet';
 import xss from 'xss-clean';
 import mongoSanitize from 'express-mongo-sanitize';
